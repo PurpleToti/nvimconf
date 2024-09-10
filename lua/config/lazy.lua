@@ -1,63 +1,60 @@
---print("lazy.lua ...")
+-- Bootstrap lazy.nvim
 
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
-
 if not (vim.uv or vim.loop).fs_stat(lazypath) then
-  vim.fn.system({
-    "git",
-    "clone",
-    "--filter=blob:none",
-    "https://github.com/folke/lazy.nvim.git",
-    "--branch=stable", -- latest stable release
-    lazypath,
-  })
+    local lazyrepo = "https://github.com/folke/lazy.nvim.git"
+    local out = vim.fn.system({ "git", "clone", "--filter=blob:none", "--branch=stable", lazyrepo, lazypath })
+    if vim.v.shell_error ~= 0 then
+        vim.api.nvim_echo({
+            { "Failed to clone lazy.nvim:\n", "ErrorMsg" },
+            { out, "WarningMsg" },
+            { "\nPress any key to exit..." },
+        }, true, {})
+        vim.fn.getchar()
+        os.exit(1)
+    end
 end
 vim.opt.rtp:prepend(lazypath)
 
+-- Setup lazy.nvim
 require("lazy").setup({
-  {
-    "nvim-treesitter/nvim-treesitter",
-    build = ":TSUpdate",
-    config = function () 
-      local configs = require("nvim-treesitter.configs")
+    spec = {
+        {
+            "rebelot/kanagawa.nvim",
+            config = function ()
+                local configs = require("kanagawa")
 
-      configs.setup({
-          ensure_installed = { "c", "lua", "vim", "vimdoc", "query", "elixir", "heex", "javascript", "html", "go" },
-          sync_install = false,
-          highlight = { enable = true },
-          indent = { enable = true },
-        })
-    end
-  },
-  {
-    "rebelot/kanagawa.nvim",
-    config = function ()
-      local configs = require("kanagawa")
-
-      configs.setup({
-        compile = false,             -- enable compiling the colorscheme
-        undercurl = true,            -- enable undercurls
-        commentStyle = { italic = true },
-        functionStyle = {},
-        keywordStyle = { italic = true},
-        statementStyle = { bold = true },
-        typeStyle = {},
-        transparent = false,         -- do not set background color
-        dimInactive = false,         -- dim inactive window `:h hl-NormalNC`
-        terminalColors = true,       -- define vim.g.terminal_color_{0,17}
-        colors = {                   -- add/modify theme and palette colors
-            palette = {},
-            theme = { wave = {}, lotus = {}, dragon = {}, all = {} },
+                configs.setup({
+                    compile = false,             -- enable compiling the colorscheme
+                    undercurl = true,            -- enable undercurls
+                    commentStyle = { italic = true },
+                    functionStyle = {},
+                    keywordStyle = { italic = true},
+                    statementStyle = { bold = true },
+                    typeStyle = {},
+                    transparent = false,         -- do not set background color
+                    dimInactive = false,         -- dim inactive window `:h hl-NormalNC`
+                    terminalColors = true,       -- define vim.g.terminal_color_{0,17}
+                    colors = {                   -- add/modify theme and palette colors
+                        palette = {},
+                        theme = { wave = {}, lotus = {}, dragon = {}, all = {} },
+                    },
+                    overrides = function(colors) -- add/modify highlights
+                        return {}
+                    end,
+                    theme = "wave",              -- Load "wave" theme when 'background' option is not set
+                    background = {               -- map the value of 'background' option to a theme
+                        dark = "wave",           -- try "dragon" !
+                        light = "lotus"
+                    },
+                })    
+            end
         },
-        overrides = function(colors) -- add/modify highlights
-            return {}
-        end,
-        theme = "lotus",              -- Load theme when 'background' option is not set
-        background = {               -- map the value of 'background' option to a theme
-            dark = "wave",           -- try "dragon" !
-            light = "lotus"
-        },
-    })
-    end
-  }
+    -- import your plugins
+    },
+    -- Configure any other settings here. See the documentation for more details.
+    -- colorscheme that will be used when installing plugins.
+    install = { colorscheme = { "habamax" } },
+    -- automatically check for plugin updates
+    checker = { enabled = true },
 })
