@@ -50,21 +50,6 @@ require("lazy").setup({
                 })    
             end
         },
-        {
-            "nvim-treesitter/nvim-treesitter",
-            compilers = { "clang", "clang++", "gcc", "g++" },
-            build = ":TSUpdate",
-            config = function () 
-                local configs = require("nvim-treesitter.configs")
-
-                configs.setup({
-                    ensure_installed = { "c", "vim"},
-                    sync_install = false,
-                    highlight = { enable = true },
-                    indent = { enable = true },  
-                })
-            end
-        },
         -- import your plugins
     },
     -- Configure any other settings here. See the documentation for more details.
