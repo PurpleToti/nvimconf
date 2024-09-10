@@ -53,12 +53,13 @@ require("lazy").setup({
         {
             "nvim-treesitter/nvim-treesitter",
             compilers = { "clang", "clang++", "gcc", "g++" },
+            -- IMPORTANT : as of 02/10/2024 on windows many compilers errors can cause crash
             build = ":TSUpdate",
             config = function () 
                 local configs = require("nvim-treesitter.configs")
 
                 configs.setup({
-                    ensure_installed = { "c", "vim"},
+                    ensure_installed = { "c", "vim", "lua"},
                     sync_install = false,
                     highlight = { enable = true },
                     indent = { enable = true },  
